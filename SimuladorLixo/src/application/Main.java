@@ -1,6 +1,7 @@
 package application;
 
 import estruturasDeDados.Fila;
+import estruturasDeDados.Lista;
 
 public class Main {
 
@@ -15,6 +16,21 @@ public class Main {
 		fila.dequeue();
 		fila.dequeue();
 		fila.imprimir();
+		System.out.println();
+		
+		Lista lista = new Lista();
+		
+		lista.add(10, 0);
+		lista.add(20, 1);
+		lista.add(30, 2);
+		lista.add(40, 3);
+		lista.imprimir();
+		
+		lista.remove(2);
+		lista.remove(1);
+		lista.imprimir();
+		
+		lista.remove(7);
 	}
 
 }
