@@ -1,20 +1,31 @@
 package estruturasDeDados;
 
+import cidade.CaminhaoPequeno;
+
 public class Fila {
 	private No head;
 	private No tail;
 	private int tamanho;
 	
 	private class No {
-		int valor;
+		CaminhaoPequeno caminhao;
 		No prox;
 		
-		No(int valor){
-			this.valor = valor;
+		No(CaminhaoPequeno caminhao){
+			this.caminhao = caminhao;
 			this.prox = null;
 		}
 	}
 	
+	public No getHead() {
+		return head;
+	}
+
+	public No getTail() {
+		return tail;
+	}
+
+
 	public Fila() {
 		head = null;
 		tail = null;
@@ -25,8 +36,8 @@ public class Fila {
 		return tamanho;
 	}
 	
-	public No enqueue(int item) {
-		No novoNo = new No (item);
+	public No enqueue(CaminhaoPequeno caminhao) {
+		No novoNo = new No (caminhao);
 		if (head == null) {
 			head = novoNo;
 		} else {
@@ -53,7 +64,7 @@ public class Fila {
 		No atual = head;
 		System.out.print("Fila: ");
 		while (atual != null) {
-			System.out.print(atual.valor + " ");
+			System.out.print(atual.caminhao + " ");
 			atual = atual.prox;
 		}
 	}

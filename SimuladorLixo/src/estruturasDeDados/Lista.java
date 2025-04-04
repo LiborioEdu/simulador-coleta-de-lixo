@@ -1,20 +1,22 @@
 package estruturasDeDados;
 
+import cidade.CaminhaoGrande;
+
 public class Lista {
 	private No inicio;
 	
 	private class No {
-		int valor;
+		CaminhaoGrande caminhaozao;
 		No prox;
 	
-		No(int valor) {
-			this.valor = valor;
+		No(CaminhaoGrande caminhaozao) {
+			this.caminhaozao = caminhaozao;
 			this.prox = null;
 		}
 	}
 	
-	public No add(int elemento, int posicao) {
-		No novoNo = new No(elemento);
+	public No add(CaminhaoGrande caminhaozao, int posicao) {
+		No novoNo = new No(caminhaozao);
 		
 		if(posicao < 0) {
 			throw new RuntimeException("Posição invárida");
@@ -71,7 +73,7 @@ public class Lista {
 		No atual = inicio;
 		System.out.print("Lista: ");
 		while (atual != null) {
-			System.out.print(atual.valor + " ");
+			System.out.print(atual.caminhaozao + " ");
 			atual = atual.prox;
 		}
 	}
