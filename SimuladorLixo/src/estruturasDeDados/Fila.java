@@ -6,7 +6,7 @@ public class Fila {
 	private No head;
 	private No tail;
 	private int tamanho;
-	
+	                                                                         //01001110 01100001 01101111 00100000 01100011 01101111 01110000 01101001 01100101 
 	private class No {
 		CaminhaoPequeno caminhao;
 		No prox;
@@ -67,6 +67,13 @@ public class Fila {
 			System.out.print(atual.caminhao + " ");
 			atual = atual.prox;
 		}
+	}
+	
+	public CaminhaoPequeno verProximoDaFila() {
+		if (head == null) {
+			return null;
+		}
+		return head.caminhao;
 	}
 	
 }

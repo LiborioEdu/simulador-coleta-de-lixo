@@ -78,4 +78,11 @@ public class Lista {
 		}
 	}
 	
+	public CaminhaoGrande verProximoDaLista() {
+		if (inicio == null) {
+			return null;
+		}
+		return inicio.caminhaozao;
+	}
+	
 }
