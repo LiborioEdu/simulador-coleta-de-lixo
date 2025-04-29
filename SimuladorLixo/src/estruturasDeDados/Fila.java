@@ -6,7 +6,7 @@ public class Fila {
 	private No head;
 	private No tail;
 	private int tamanho;
-	                                                                         //01001110 01100001 01101111 00100000 01100011 01101111 01110000 01101001 01100101 
+	                                                                        
 	private class No {
 		CaminhaoPequeno caminhao;
 		No prox;
@@ -49,15 +49,17 @@ public class Fila {
 	}
 	
 	public No dequeue() {
-		if(tail == null) {
-			throw new RuntimeException("A Fila está vazia");
-		} else if(head.prox == null) {
-				head.prox = null;
-				tail.prox = null;
-		} else {
-			head = head.prox;
-		}
-		return head;
+	    if (head == null) {
+	        throw new RuntimeException("A fila está vazia");
+	    }
+
+	    No removido = head;
+	    head = head.prox;
+	    if (head == null) {
+	        tail = null;
+	    }
+	    tamanho--;
+	    return removido;
 	}
 	
 	public void imprimir() {

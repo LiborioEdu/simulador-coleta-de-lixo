@@ -1,34 +1,22 @@
 package cidade;
 
-public class CaminhaoPequeno {
-	private int contadorId = 1;
-	private int id;
-	private int capacidadePequeno;
-	private int cargaAtualPequeno;
-	
-	public CaminhaoPequeno(int capacidadePequeno) {
-		this.id = contadorId++;
-		this.capacidadePequeno = capacidadePequeno;
-		this.cargaAtualPequeno = 0;
-	}
+public abstract class CaminhaoPequeno {
+    protected int capacidade;
+    protected int cargaAtual;
 
-	public int getCapacidadePequeno() {
-		return capacidadePequeno;
-	}
+    public abstract boolean coletar(int quantidade);
 
-	public int getCargaAtualPequeno() {
-		return cargaAtualPequeno;
-	}
-	
     public boolean estaCheio() {
-        return cargaAtualPequeno == capacidadePequeno;
+        return cargaAtual >= capacidade;
     }
-	
-    
-    public void coletarLixo(int quantidadeDeLixo) {
-    	while(cargaAtualPequeno < capacidadePequeno) {
-    		cargaAtualPequeno += quantidadeDeLixo;
-    	}
-    	System.out.println("Caminhão pequeno " + id + " está lotado, encaminhando para a estação de transferencia");
+
+    public int descarregar() {
+        int carga = cargaAtual;
+        cargaAtual = 0;
+        return carga;
+    }
+
+    public int getCargaAtual() {
+        return cargaAtual;
     }
 }

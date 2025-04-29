@@ -1,40 +1,22 @@
 package cidade;
 
 public class CaminhaoGrande {
-	private int contadorId = 1;
-	private int id;
-	private int capacidadeMaxGrande = 20;
-	private int cargaAtualGrande;
-	
-	public CaminhaoGrande() {
-		this.id = contadorId++;
-		this.cargaAtualGrande = 0;
-	}
+    protected int capacidadeMaxima = 20000;
+    protected int cargaAtual;
 
-	public int getId() {
-		return id;
-	}
+    public void carregar(int quantidade) {
+        cargaAtual += quantidade;
+        if (cargaAtual > capacidadeMaxima) {
+            cargaAtual = capacidadeMaxima;
+        }
+    }
 
-	public int getCapacidadeMaxGrande() {
-		return capacidadeMaxGrande;
-	}
+    public boolean prontoParaPartir() {
+        return cargaAtual >= capacidadeMaxima;
+    }
 
-	public int getCargaAtual() {
-		return cargaAtualGrande;
-	}
-	
-	public void receberCarga(int carga) {
-		if (carga <= getCapacidadeMaxGrande()) {
-			cargaAtualGrande += carga;
-		} else {
-			System.out.println("Caminhão Grande está cheio, aguarde ele voltar");
-			enviarParaAterro();
-		}
-	}
-	
-	public void enviarParaAterro() {
-		cargaAtualGrande = 0;
-	}
-	
-
+    public void descarregar() {
+        System.out.println("Caminhão grande partiu para o aterro com " + cargaAtual + "kg.");
+        cargaAtual = 0;
+    }
 }
