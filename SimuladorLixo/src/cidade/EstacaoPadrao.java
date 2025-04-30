@@ -37,7 +37,6 @@ public class EstacaoPadrao extends EstacaoTransferencia{
     @Override
     public void descarregarParaCaminhaoGrande(CaminhaoGrande caminhao) {
         caminhao.carregar(lixoArmazenado);
-        lixoArmazenado = 0;
         listaCaminhoesGrandes.add(caminhao, 0);
         System.out.println("Estação " + nome + " carregou caminhão grande com " + lixoArmazenado + "kg.");
     }

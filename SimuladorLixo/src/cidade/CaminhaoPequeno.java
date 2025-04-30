@@ -1,7 +1,7 @@
 package cidade;
 
 public abstract class CaminhaoPequeno {
-    protected int capacidade;
+    public int capacidade;
     protected int cargaAtual;
 
     public abstract boolean coletar(int quantidade);

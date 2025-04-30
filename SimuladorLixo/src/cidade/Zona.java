@@ -11,10 +11,11 @@ public class Zona {
         this.lixoAcumulado = 0;
     }
 
-    public void gerarLixo() {
+    public int gerarLixo() {
         int quantidade = new Random().nextInt(500) + 100;
         lixoAcumulado += quantidade;
         System.out.println(nome + ": Gerou " + quantidade + "kg de lixo. Total: " + lixoAcumulado + "kg.");
+		return quantidade;
     }
 
     public int coletarLixo(int quantidade) {

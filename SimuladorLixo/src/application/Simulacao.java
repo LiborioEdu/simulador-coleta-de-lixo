@@ -10,8 +10,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cidade.CaminhaoGrandePadrao;
+import cidade.CaminhaoPequeno;
 import cidade.CaminhaoPequenoPadrao;
 import cidade.EstacaoPadrao;
+import cidade.Zona;
+import estruturasDeDados.Fila;
 
 public class Simulacao implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -21,6 +24,8 @@ public class Simulacao implements Serializable{
     private boolean pausado = false;
     
     private EstacaoPadrao estacao;
+    private Fila filaCaminhoesPequenos = new Fila();
+    private Zona zonaNorte = new Zona("Zona Norte");
 
     public void iniciar() {
         System.out.println("Simulação iniciada...");
@@ -68,21 +73,37 @@ public class Simulacao implements Serializable{
 
     public void atualizarSimulacao() {
         System.out.println("Tempo simulado: " + tempoSimulado + " minutos");
+        int lixoGerado = zonaNorte.gerarLixo();
         
-        if (tempoSimulado % 2 == 0) { // 2 minutos o caminhao pequeno enche e vai pra estação
-            CaminhaoPequenoPadrao pequeno = new CaminhaoPequenoPadrao();
-            pequeno.coletar(2000);
-            estacao.receberCaminhaoPequeno(pequeno);
+        if (filaCaminhoesPequenos.tamanho() == 0 || filaCaminhoesPequenos.verProximoDaFila().estaCheio()) {
+            filaCaminhoesPequenos.enqueue(new CaminhaoPequenoPadrao());
         }
         
+        CaminhaoPequeno caminhaoAtual = filaCaminhoesPequenos.verProximoDaFila();
+        boolean conseguiuColetar = caminhaoAtual.coletar(lixoGerado);
+        
+        if (!conseguiuColetar) {
+            int capacidadeRestante = caminhaoAtual.capacidade - caminhaoAtual.getCargaAtual();
+            caminhaoAtual.coletar(capacidadeRestante);
+
+            if(caminhaoAtual.estaCheio()) {
+	            estacao.receberCaminhaoPequeno(caminhaoAtual);
+	            filaCaminhoesPequenos.dequeue();
+            }
+          
+            CaminhaoPequeno novoCaminhao = new CaminhaoPequenoPadrao();
+            novoCaminhao.coletar(lixoGerado - capacidadeRestante);
+            filaCaminhoesPequenos.enqueue(novoCaminhao);
+        }
+               
         estacao.processarFila();
         
-        if (tempoSimulado % 5 == 0) {	// 5 minutos, o pequeno vai pra fila pra ser descarregado para o grande
+        if (tempoSimulado % 2 == 0) { // a cada 2 min, o um pequeno vai para a estação para ser descarregado
             CaminhaoGrandePadrao grande = new CaminhaoGrandePadrao();
             estacao.descarregarParaCaminhaoGrande(grande);
         }
         
-        if (tempoSimulado % 10 == 0) { // 10 minutos o tempo de tolerancia de espera do caminhao grande para ir para o aterro
+        if (tempoSimulado % 30 == 0) { // 30 minutos o tempo de tolerancia de espera do caminhao grande para ir para o aterro
             estacao.enviarCaminhoesGrandesParaAterro();
         }
     }
