@@ -3,6 +3,16 @@ package cidade;
 public abstract class CaminhaoPequeno {
     public int capacidade;
     protected int cargaAtual;
+    protected static int proximoId = 1;
+    protected String id;
+    
+    public CaminhaoPequeno() {
+        this.id = String.format("%04d", proximoId++);
+    }
+    
+    public String getId() {
+        return id;
+    }
 
     public abstract boolean coletar(int quantidade);
 

@@ -2,6 +2,7 @@ package cidade;
 
 public class CaminhaoPequenoPadrao extends CaminhaoPequeno{
     public CaminhaoPequenoPadrao() {
+    	super();
         this.capacidade = 2000;
         this.cargaAtual = 0;
     }

@@ -98,7 +98,7 @@ public class Simulacao implements Serializable{
                
         estacao.processarFila();
         
-        if (tempoSimulado % 2 == 0) { // a cada 2 min, o um pequeno vai para a estação para ser descarregado
+        if (tempoSimulado % 10 == 0) { // a cada 10 min a estação carrega o lixo para o caminhão grande
             estacao.descarregarParaCaminhaoGrande(new CaminhaoGrandePadrao());
         }
         

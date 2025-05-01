@@ -29,7 +29,7 @@ public class EstacaoPadrao extends EstacaoTransferencia{
                 int descarregado = pequeno.descarregar();
                 lixoArmazenado += descarregado;
                 filaCaminhoesPequenos.dequeue();
-                System.out.println("Caminhão pequeno descarregou " + descarregado + "kg na estação " + nome);
+                System.out.println("Caminhão pequeno ID " + pequeno.getId() + " com capacidade " + pequeno.capacidade + "kg descarregou " + descarregado + "kg na estação " + nome);
             }
         }
     }
