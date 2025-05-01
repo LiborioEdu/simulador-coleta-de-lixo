@@ -35,15 +35,29 @@ public class EstacaoPadrao extends EstacaoTransferencia{
     }
 
     @Override
-    public void descarregarParaCaminhaoGrande(CaminhaoGrande caminhao) {
-        caminhao.carregar(lixoArmazenado);
-        listaCaminhoesGrandes.add(caminhao, 0);
+    public void descarregarParaCaminhaoGrande(CaminhaoGrande novoCaminhao) {
+        CaminhaoGrande caminhaoAtual = listaCaminhoesGrandes.verProximoDaLista();
+
+        if (caminhaoAtual == null) {
+            caminhaoAtual = novoCaminhao;
+            listaCaminhoesGrandes.add(caminhaoAtual, 0);
+        }
+
+        caminhaoAtual.carregar(lixoArmazenado);
         System.out.println("Estação " + nome + " carregou caminhão grande com " + lixoArmazenado + "kg.");
+        lixoArmazenado = 0;
+
+        if (caminhaoAtual.prontoParaPartir()) {
+            caminhaoAtual.descarregar();
+            listaCaminhoesGrandes.remove(0);
+        }
     }
     
     public void enviarCaminhoesGrandesParaAterro() {
-        while (listaCaminhoesGrandes.verProximoDaLista() != null) {
-            CaminhaoGrande caminhao = listaCaminhoesGrandes.verProximoDaLista();
+        CaminhaoGrande caminhao = listaCaminhoesGrandes.verProximoDaLista();
+
+        if (caminhao != null && caminhao.getCargaAtual() > 0) {
+            System.out.println("Caminhão grande enviado para o aterro (tolerância atingida) com " + caminhao.getCargaAtual() + "kg.");
             caminhao.descarregar();
             listaCaminhoesGrandes.remove(0);
         }

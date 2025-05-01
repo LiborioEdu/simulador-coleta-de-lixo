@@ -3,6 +3,10 @@ package cidade;
 public class CaminhaoGrande {
     protected int capacidadeMaxima = 20000;
     protected int cargaAtual;
+    
+    public int getCargaAtual() {
+        return cargaAtual;
+    }
 
     public void carregar(int quantidade) {
         cargaAtual += quantidade;

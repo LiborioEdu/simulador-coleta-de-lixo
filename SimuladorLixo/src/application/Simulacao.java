@@ -99,8 +99,7 @@ public class Simulacao implements Serializable{
         estacao.processarFila();
         
         if (tempoSimulado % 2 == 0) { // a cada 2 min, o um pequeno vai para a estação para ser descarregado
-            CaminhaoGrandePadrao grande = new CaminhaoGrandePadrao();
-            estacao.descarregarParaCaminhaoGrande(grande);
+            estacao.descarregarParaCaminhaoGrande(new CaminhaoGrandePadrao());
         }
         
         if (tempoSimulado % 30 == 0) { // 30 minutos o tempo de tolerancia de espera do caminhao grande para ir para o aterro
