@@ -48,6 +48,7 @@ public class EstacaoPadrao extends EstacaoTransferencia{
         lixoArmazenado = 0;
 
         if (caminhaoAtual.prontoParaPartir()) {
+        	System.out.println("Caminhão grande está cheio e será enviado ao aterro com " + caminhaoAtual.getCargaAtual() + "kg.");
             caminhaoAtual.descarregar();
             listaCaminhoesGrandes.remove(0);
         }
