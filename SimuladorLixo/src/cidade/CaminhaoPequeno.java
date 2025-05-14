@@ -29,4 +29,13 @@ public abstract class CaminhaoPequeno {
     public int getCargaAtual() {
         return cargaAtual;
     }
+    
+    public int getCapacidade() {
+        return capacidade;
+    }
+    
+    @Override
+    public String toString() {
+        return "Caminhão ID " + id + " (" + capacidade + "kg)";
+    }
 }
