@@ -45,13 +45,14 @@ public class Zona {
     public int gerarLixo() {
         int quantidade = random.nextInt(maxGeracaoLixo - minGeracaoLixo + 1) + minGeracaoLixo;
         lixoAcumulado += quantidade;
-        System.out.println(nome + ": Gerou " + quantidade + "kg de lixo. Total: " + lixoAcumulado + "kg.");
-		return quantidade;
+        System.out.println(nome + ": Gerou " + quantidade + "kg de lixo. Total acumulado: " + lixoAcumulado + "kg.");
+        return quantidade;
     }
 
     public int coletarLixo(int quantidade) {
         int coletado = Math.min(quantidade, lixoAcumulado);
         lixoAcumulado -= coletado;
+        System.out.println(nome + ": Coletado " + coletado + "kg. Restante: " + lixoAcumulado + "kg.");
         return coletado;
     }
 

@@ -7,13 +7,29 @@ public class Fila {
 	private No tail;
 	private int tamanho;
 	                                                                        
-	private class No {
-		CaminhaoPequeno caminhao;
-		No prox;
+	public class No {
+		private CaminhaoPequeno caminhao;
+		private No prox;
 		
 		No(CaminhaoPequeno caminhao){
+			this.setCaminhao(caminhao);
+			this.setProx(null);
+		}
+
+		public CaminhaoPequeno getCaminhao() {
+			return caminhao;
+		}
+
+		public void setCaminhao(CaminhaoPequeno caminhao) {
 			this.caminhao = caminhao;
-			this.prox = null;
+		}
+
+		public No getProx() {
+			return prox;
+		}
+
+		public void setProx(No prox) {
+			this.prox = prox;
 		}
 	}
 	
@@ -41,7 +57,7 @@ public class Fila {
 		if (head == null) {
 			head = novoNo;
 		} else {
-			tail.prox = novoNo;
+			tail.setProx(novoNo);
 		}
 		tail = novoNo;
 		tamanho++;
@@ -54,7 +70,7 @@ public class Fila {
 	    }
 
 	    No removido = head;
-	    head = head.prox;
+	    head = head.getProx();
 	    if (head == null) {
 	        tail = null;
 	    }
@@ -66,8 +82,8 @@ public class Fila {
 		No atual = head;
 		System.out.print("Fila: ");
 		while (atual != null) {
-			System.out.print(atual.caminhao + " ");
-			atual = atual.prox;
+			System.out.print(atual.getCaminhao() + " ");
+			atual = atual.getProx();
 		}
 	}
 	
@@ -75,7 +91,7 @@ public class Fila {
 		if (head == null) {
 			return null;
 		}
-		return head.caminhao;
+		return head.getCaminhao();
 	}
 	
 }

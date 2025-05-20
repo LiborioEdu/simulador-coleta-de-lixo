@@ -18,6 +18,7 @@ import cidade.CaminhaoPequenoPadrao;
 import cidade.EstacaoPadrao;
 import cidade.Zona;
 import estruturasDeDados.Fila;
+import estruturasDeDados.Lista;
 
 public class Simulacao implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -28,6 +29,7 @@ public class Simulacao implements Serializable{
     
     private EstacaoPadrao estacao;
     private Fila filaCaminhoesPequenos = new Fila();
+    private Lista filaCaminhoesDescansando = new Lista();
     
     private Zona zonaNorte = new Zona("Zona Norte");
     private Zona zonaSul = new Zona("Zona Sul");
@@ -39,6 +41,7 @@ public class Simulacao implements Serializable{
     public void iniciar() {
         System.out.println("Simulação iniciada...");
         estacao = new EstacaoPadrao("Estação Central");
+        
         
         zonaNorte.configurarGeracaoLixo(200, 500);
         zonaSul.configurarGeracaoLixo(300, 600);
@@ -53,11 +56,21 @@ public class Simulacao implements Serializable{
         zonaSudeste.configurarTempoViagem(10, 14, 5, 7);
 
         
-        Zona[] roteiro = new Zona[] {
-        	    zonaCentro, zonaNorte, zonaSul, zonaLeste, zonaSudeste
-        	};
-        	CaminhaoPequeno.setRoteiro(roteiro);
+        Zona[] roteiro = new Zona[] {zonaCentro, zonaNorte, zonaSul, zonaLeste, zonaSudeste};
+        CaminhaoPequeno.setRoteiro(roteiro);
        
+        for (CaminhaoPequeno cam : new CaminhaoPequeno[]{
+                new CaminhaoPequenoPadrao(),
+                new CaminhaoPequeno4t(),
+                new CaminhaoPequeno8t(),
+                new CaminhaoPequeno10t()
+        }) {
+            Zona primeiraZona = roteiro[0];
+            int tempo = primeiraZona.calcularTempoViagem(tempoSimulado);
+            cam.iniciarViagemParaZona(primeiraZona, tempo);
+            filaCaminhoesPequenos.enqueue(cam);
+        }
+        
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -99,9 +112,108 @@ public class Simulacao implements Serializable{
         }
     }
     
+    private CaminhaoPequeno escolherCaminhao(int lixoRestante) {
+        if (lixoRestante >= 10000) return new CaminhaoPequeno10t();
+        if (lixoRestante >= 8000) return new CaminhaoPequeno8t();
+        if (lixoRestante >= 4000) return new CaminhaoPequeno4t();
+        return new CaminhaoPequenoPadrao();
+    }
+    
 
     
     public void atualizarSimulacao() {
+        System.out.println("\n=== Tempo simulado: " + tempoSimulado + " minutos ===");
+        
+        // 1. Gerar lixo em todas as zonas
+        Zona[] zonas = {zonaNorte, zonaSul, zonaLeste, zonaCentro, zonaSudeste};
+        for (Zona zona : zonas) {
+            zona.gerarLixo(); // Gerar lixo em todas as zonas
+        }
+        
+        // 2. Processar cada caminhão na fila
+        Fila.No noAtual = filaCaminhoesPequenos.getHead();
+        while (noAtual != null) {
+            CaminhaoPequeno caminhao = noAtual.getCaminhao();
+            
+            // Atualizar tempo de viagem
+            caminhao.atualizarTempoDeslocamento();
+            
+            if (caminhao.chegouNaZona()) {
+                if (caminhao.isEmViagemParaEstacao()) {
+                    // Chegou na estação - descarregar
+                    System.out.println("Caminhão " + caminhao.getId() + " chegou na estação");
+                    estacao.receberCaminhaoPequeno(caminhao);
+                    
+                    // Programar próxima viagem para a próxima zona do roteiro
+                    Zona proximaZona = caminhao.getProximaZona();
+                    int tempoViagem = proximaZona.calcularTempoViagem(tempoSimulado);
+                    caminhao.iniciarViagemParaZona(proximaZona, tempoViagem);
+                    System.out.println("Caminhão " + caminhao.getId() + " programado para ir para " + 
+                                      proximaZona.getNome() + " (tempo: " + tempoViagem + " min)");
+                } else {
+                    // Chegou na zona - coletar lixo
+                    Zona zonaAtual = caminhao.getZonaAtual();
+                    int lixoDisponivel = zonaAtual.getLixoAcumulado();
+                    
+                    if (lixoDisponivel > 0) {
+                        int lixoColetado = Math.min(lixoDisponivel, caminhao.getCapacidade() - caminhao.getCargaAtual());
+                        boolean coletou = caminhao.coletar(lixoColetado);
+                        
+                        if (coletou) {
+                            zonaAtual.coletarLixo(lixoColetado);
+                            System.out.println("Caminhão " + caminhao.getId() + " coletou " + lixoColetado + 
+                                             "kg na " + zonaAtual.getNome() + ". Carga atual: " + 
+                                             caminhao.getCargaAtual() + "/" + caminhao.getCapacidade());
+                        }
+                        
+                        // Verificar se deve voltar para a estação
+                        if (caminhao.estaCheio() || lixoDisponivel - lixoColetado <= 0) {
+                            int tempoViagem = zonaAtual.calcularTempoViagem(tempoSimulado);
+                            caminhao.iniciarViagemParaEstacao(tempoViagem);
+                            caminhao.registrarViagem();
+                            System.out.println("Caminhão " + caminhao.getId() + " voltando para estação. " +
+                                             "Tempo de viagem: " + tempoViagem + " min");
+                        }
+                    } else {
+                        // Se não tem lixo, vai para próxima zona
+                        Zona proximaZona = caminhao.getProximaZona();
+                        int tempoViagem = proximaZona.calcularTempoViagem(tempoSimulado);
+                        caminhao.iniciarViagemParaZona(proximaZona, tempoViagem);
+                        System.out.println("Caminhão " + caminhao.getId() + " indo para " + 
+                                         proximaZona.getNome() + " (sem lixo na zona atual)");
+                    }
+                }
+            } else {
+                // Ainda em trânsito
+                System.out.println("Caminhão " + caminhao.getId() + " em trânsito para " + 
+                                 (caminhao.isEmViagemParaEstacao() ? "Estação Central" : caminhao.getZonaAtual().getNome()) + 
+                                 ". Tempo restante: " + caminhao.getTempoParaChegar() + " min");
+            }
+            
+            noAtual = noAtual.getProx();
+        }
+        
+        // Processar estação e outras lógicas
+        estacao.processarFila();
+        
+        if (tempoSimulado % 10 == 0) {
+            estacao.descarregarParaCaminhaoGrande(new CaminhaoGrandePadrao());
+        }
+        
+        if (tempoSimulado % 30 == 0) {
+            estacao.enviarCaminhoesGrandesParaAterro();
+        }
+        
+        if (tempoSimulado % 1440 == 0) {
+            System.out.println("=== NOVO DIA == Resetando viagens dos caminhões...");
+            Fila.No atual = filaCaminhoesPequenos.getHead();
+            while (atual != null) {
+                atual.getCaminhao().resetarViagens();
+                atual = atual.getProx();
+            }
+        }
+    	
+    	/*
     	System.out.println("\n=== Tempo simulado: " + tempoSimulado + " minutos ===");
         
         Zona[] zonas = { zonaNorte, zonaSul, zonaLeste, zonaCentro, zonaSudeste };
@@ -109,11 +221,18 @@ public class Simulacao implements Serializable{
         for (Zona zona : zonas) {
             int lixoGerado = zona.gerarLixo();
             
-            if (filaCaminhoesPequenos.tamanho() == 0 || filaCaminhoesPequenos.verProximoDaFila().estaCheio()) {
-                filaCaminhoesPequenos.enqueue(new CaminhaoPequenoPadrao());
-            }
+            
+            
+        CaminhaoPequeno caminhaoAtual = filaCaminhoesPequenos.verProximoDaFila();
 
-            CaminhaoPequeno caminhaoAtual = filaCaminhoesPequenos.verProximoDaFila();
+         // Se não houver caminhão, ou ele está cheio ou atingiu o limite de viagens
+         if (caminhaoAtual == null || caminhaoAtual.estaCheio() || !caminhaoAtual.podeViajar()) {
+             CaminhaoPequeno novo = escolherCaminhao(lixoGerado);
+             filaCaminhoesPequenos.enqueue(novo);
+             caminhaoAtual = novo;
+         }
+
+      
             boolean conseguiuColetar = caminhaoAtual.coletar(lixoGerado);
 
             if (!conseguiuColetar) {
@@ -122,6 +241,7 @@ public class Simulacao implements Serializable{
                 caminhaoAtual.coletar(capacidadeRestante);
 
                 if (caminhaoAtual.estaCheio()) {
+                	caminhaoAtual.registrarViagem();
                     Zona zonaAtual = zona; // zona onde o caminhão estava coletando
                     int tempoViagem = zonaAtual.calcularTempoViagem(tempoSimulado);
                     caminhaoAtual.setTempoDeViagem(tempoViagem);
@@ -132,16 +252,17 @@ public class Simulacao implements Serializable{
 
                 int restante = lixoGerado - capacidadeRestante;
 
-                CaminhaoPequeno[] novosCaminhoes = {
-                    new CaminhaoPequeno4t(),
-                    new CaminhaoPequeno8t(),
-                    new CaminhaoPequeno10t()
-                };
-
-                for (CaminhaoPequeno novo : novosCaminhoes) {
-                	novo.coletar(restante);
-                    filaCaminhoesPequenos.enqueue(novo);
-                }
+            }
+            
+        }
+        
+        if (tempoSimulado % 1440 == 0) {
+            System.out.println("Resetando viagens dos caminhões...");
+            // Resetar todos os caminhões ativos na fila
+            Fila.No atual = filaCaminhoesPequenos.getHead();
+            while (atual != null) {
+                atual.getCaminhao().resetarViagens();
+                atual = atual.getProx();
             }
         }
 		
@@ -157,6 +278,7 @@ public class Simulacao implements Serializable{
         }
         
         estacao.processarFila();
+        */
     }
    
 }
