@@ -5,6 +5,7 @@ public class CaminhaoPequenoPadrao extends CaminhaoPequeno{
     	super();
         this.capacidade = 2000;
         this.cargaAtual = 0;
+        this.maxViagensPorDia = 10;
     }
 
     @Override

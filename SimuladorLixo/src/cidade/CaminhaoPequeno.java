@@ -7,7 +7,7 @@ public abstract class CaminhaoPequeno {
     protected String id;
     protected int tempoDeViagem;
     protected int viagensRealizadasHoje = 0;
-    protected int maxViagensPorDia = 5;
+    public int maxViagensPorDia;
     
     protected static Zona[] roteiro;
     protected int proximaZonaIndex = 0;
@@ -85,7 +85,8 @@ public abstract class CaminhaoPequeno {
     
     @Override
     public String toString() {
-        return "Caminhão ID " + getId() + " (" + capacidade + "kg)";
+        return "Caminhão ID " + getId() + " (" + capacidade + "kg, " + 
+                viagensRealizadasHoje + "/" + maxViagensPorDia + " viagens)";
     }
     
     public static void setRoteiro(Zona[] zonas) {

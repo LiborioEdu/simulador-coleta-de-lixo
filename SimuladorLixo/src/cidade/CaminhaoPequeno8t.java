@@ -5,6 +5,7 @@ public class CaminhaoPequeno8t extends CaminhaoPequeno {
         super();
         this.capacidade = 8000;
         this.cargaAtual = 0;
+        this.maxViagensPorDia = 4;
     }
 
     @Override
