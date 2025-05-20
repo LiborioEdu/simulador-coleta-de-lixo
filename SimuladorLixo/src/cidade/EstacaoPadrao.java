@@ -1,5 +1,6 @@
 package cidade;
 
+import application.Simulacao;
 import estruturasDeDados.Fila;
 import estruturasDeDados.Lista;
 
@@ -19,20 +20,25 @@ public class EstacaoPadrao extends EstacaoTransferencia{
     @Override
     public void receberCaminhaoPequeno(CaminhaoPequeno caminhao) {
     	filaCaminhoesPequenos.enqueue(caminhao);
-        System.out.println("Caminhão pequeno chegou à estação " + nome);
+        System.out.println("Caminhão pequeno chegou à estação " + nome + " após " + caminhao.getTempoDeViagem() + " minutos de viagem.");
     }
     
     public void processarFila() {
+    	
         while (filaCaminhoesPequenos.tamanho() > 0) {
             CaminhaoPequeno pequeno = filaCaminhoesPequenos.verProximoDaFila();
             if (pequeno != null) {
                 int descarregado = pequeno.descarregar();
                 lixoArmazenado += descarregado;
                 filaCaminhoesPequenos.dequeue();
+                
+                
                 System.out.println("Caminhão pequeno ID " + pequeno.getId() + " com capacidade " + pequeno.capacidade + "kg descarregou " + descarregado + "kg na estação " + nome);
             }
         }
     }
+    
+
 
     @Override
     public void descarregarParaCaminhaoGrande(CaminhaoGrande novoCaminhao) {

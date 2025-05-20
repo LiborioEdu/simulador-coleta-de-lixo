@@ -28,6 +28,7 @@ public class Simulacao implements Serializable{
     
     private EstacaoPadrao estacao;
     private Fila filaCaminhoesPequenos = new Fila();
+    
     private Zona zonaNorte = new Zona("Zona Norte");
     private Zona zonaSul = new Zona("Zona Sul");
     private Zona zonaLeste = new Zona("Zona Leste");
@@ -38,6 +39,25 @@ public class Simulacao implements Serializable{
     public void iniciar() {
         System.out.println("Simulação iniciada...");
         estacao = new EstacaoPadrao("Estação Central");
+        
+        zonaNorte.configurarGeracaoLixo(200, 500);
+        zonaSul.configurarGeracaoLixo(300, 600);
+        zonaLeste.configurarGeracaoLixo(150, 450);
+        zonaCentro.configurarGeracaoLixo(250, 550);
+        zonaSudeste.configurarGeracaoLixo(180, 400);
+        
+        zonaNorte.configurarTempoViagem(10, 15, 5, 8);  // Pico: 10–15 min, Fora pico: 5–8 min
+        zonaSul.configurarTempoViagem(12, 18, 6, 10);
+        zonaLeste.configurarTempoViagem(8, 12, 4, 6);
+        zonaCentro.configurarTempoViagem(15, 20, 7, 12);
+        zonaSudeste.configurarTempoViagem(10, 14, 5, 7);
+
+        
+        Zona[] roteiro = new Zona[] {
+        	    zonaCentro, zonaNorte, zonaSul, zonaLeste, zonaSudeste
+        	};
+        	CaminhaoPequeno.setRoteiro(roteiro);
+       
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -78,9 +98,11 @@ public class Simulacao implements Serializable{
             return sim;
         }
     }
+    
 
+    
     public void atualizarSimulacao() {
-        System.out.println("Tempo simulado: " + tempoSimulado + " minutos");
+    	System.out.println("\n=== Tempo simulado: " + tempoSimulado + " minutos ===");
         
         Zona[] zonas = { zonaNorte, zonaSul, zonaLeste, zonaCentro, zonaSudeste };
 
@@ -100,6 +122,10 @@ public class Simulacao implements Serializable{
                 caminhaoAtual.coletar(capacidadeRestante);
 
                 if (caminhaoAtual.estaCheio()) {
+                    Zona zonaAtual = zona; // zona onde o caminhão estava coletando
+                    int tempoViagem = zonaAtual.calcularTempoViagem(tempoSimulado);
+                    caminhaoAtual.setTempoDeViagem(tempoViagem);
+
                     estacao.receberCaminhaoPequeno(caminhaoAtual);
                     filaCaminhoesPequenos.dequeue();
                 }
@@ -118,10 +144,9 @@ public class Simulacao implements Serializable{
                 }
             }
         }
-
-        
+		
      
-        estacao.processarFila();
+        
         
         if (tempoSimulado % 10 == 0) { // a cada 10 min a estação carrega o lixo para o caminhão grande
             estacao.descarregarParaCaminhaoGrande(new CaminhaoGrandePadrao());
@@ -130,5 +155,8 @@ public class Simulacao implements Serializable{
         if (tempoSimulado % 30 == 0) { // 30 minutos o tempo de tolerancia de espera do caminhao grande para ir para o aterro
             estacao.enviarCaminhoesGrandesParaAterro();
         }
+        
+        estacao.processarFila();
     }
+   
 }
