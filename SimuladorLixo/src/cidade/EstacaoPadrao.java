@@ -9,6 +9,9 @@ public class EstacaoPadrao extends EstacaoTransferencia{
     private int lixoArmazenado;
     private Fila filaCaminhoesPequenos;
     private Lista listaCaminhoesGrandes;
+    
+    private int tempoMaximoEspera = 30; // minutos (pode ser configurável)
+    private int tempoEsperaAtual = 0;
 
     public EstacaoPadrao(String nome) {
         super(nome);
@@ -24,7 +27,26 @@ public class EstacaoPadrao extends EstacaoTransferencia{
     }
     
     public void processarFila() {
-    	
+        boolean caminhoesEsperando = filaCaminhoesPequenos.tamanho() > 0;
+        
+        if (caminhoesEsperando) {
+            tempoEsperaAtual++; // Incrementa o tempo de espera
+            
+            System.out.println("Caminhões pequenos esperando há " + tempoEsperaAtual + 
+                             " minutos (limite: " + tempoMaximoEspera + " minutos)");
+            
+            // Verificar se excedeu o tempo máximo
+            if (tempoEsperaAtual >= tempoMaximoEspera) {
+                System.out.println("ALERTA: Tempo de espera excedido! Acionando caminhão grande adicional.");
+                CaminhaoGrande novoCaminhao = new CaminhaoGrandePadrao();
+                listaCaminhoesGrandes.add(novoCaminhao, 0);
+                tempoEsperaAtual = 0; // Reseta o contador
+            }
+        } else {
+            tempoEsperaAtual = 0; // Reseta se não há caminhões esperando
+        }
+
+        // Processamento normal da fila
         while (filaCaminhoesPequenos.tamanho() > 0) {
             CaminhaoPequeno pequeno = filaCaminhoesPequenos.verProximoDaFila();
             if (pequeno != null) {
@@ -32,8 +54,8 @@ public class EstacaoPadrao extends EstacaoTransferencia{
                 lixoArmazenado += descarregado;
                 filaCaminhoesPequenos.dequeue();
                 
-                
-                System.out.println("Caminhão pequeno ID " + pequeno.getId() + " com capacidade " + pequeno.capacidade + "kg descarregou " + descarregado + "kg na estação " + nome);
+                System.out.println("Caminhão pequeno ID " + pequeno.getId() + 
+                                 " descarregou " + descarregado + "kg na estação " + nome);
             }
         }
     }
@@ -68,5 +90,9 @@ public class EstacaoPadrao extends EstacaoTransferencia{
             caminhao.descarregar();
             listaCaminhoesGrandes.remove(0);
         }
+    }
+    
+    public void configurarTempoMaximoEspera(int minutos) {
+        this.tempoMaximoEspera = minutos;
     }
 }

@@ -217,72 +217,7 @@ public class Simulacao implements Serializable{
             }
         }
     	
-    	/*
-    	System.out.println("\n=== Tempo simulado: " + tempoSimulado + " minutos ===");
-        
-        Zona[] zonas = { zonaNorte, zonaSul, zonaLeste, zonaCentro, zonaSudeste };
 
-        for (Zona zona : zonas) {
-            int lixoGerado = zona.gerarLixo();
-            
-            
-            
-        CaminhaoPequeno caminhaoAtual = filaCaminhoesPequenos.verProximoDaFila();
-
-         // Se não houver caminhão, ou ele está cheio ou atingiu o limite de viagens
-         if (caminhaoAtual == null || caminhaoAtual.estaCheio() || !caminhaoAtual.podeViajar()) {
-             CaminhaoPequeno novo = escolherCaminhao(lixoGerado);
-             filaCaminhoesPequenos.enqueue(novo);
-             caminhaoAtual = novo;
-         }
-
-      
-            boolean conseguiuColetar = caminhaoAtual.coletar(lixoGerado);
-
-            if (!conseguiuColetar) {
-            	
-                int capacidadeRestante = caminhaoAtual.capacidade - caminhaoAtual.getCargaAtual();
-                caminhaoAtual.coletar(capacidadeRestante);
-
-                if (caminhaoAtual.estaCheio()) {
-                	caminhaoAtual.registrarViagem();
-                    Zona zonaAtual = zona; // zona onde o caminhão estava coletando
-                    int tempoViagem = zonaAtual.calcularTempoViagem(tempoSimulado);
-                    caminhaoAtual.setTempoDeViagem(tempoViagem);
-
-                    estacao.receberCaminhaoPequeno(caminhaoAtual);
-                    filaCaminhoesPequenos.dequeue();
-                }
-
-                int restante = lixoGerado - capacidadeRestante;
-
-            }
-            
-        }
-        
-        if (tempoSimulado % 1440 == 0) {
-            System.out.println("Resetando viagens dos caminhões...");
-            // Resetar todos os caminhões ativos na fila
-            Fila.No atual = filaCaminhoesPequenos.getHead();
-            while (atual != null) {
-                atual.getCaminhao().resetarViagens();
-                atual = atual.getProx();
-            }
-        }
-		
-     
-        
-        
-        if (tempoSimulado % 10 == 0) { // a cada 10 min a estação carrega o lixo para o caminhão grande
-            estacao.descarregarParaCaminhaoGrande(new CaminhaoGrandePadrao());
-        }
-        
-        if (tempoSimulado % 30 == 0) { // 30 minutos o tempo de tolerancia de espera do caminhao grande para ir para o aterro
-            estacao.enviarCaminhoesGrandesParaAterro();
-        }
-        
-        estacao.processarFila();
-        */
     }
    
 }
