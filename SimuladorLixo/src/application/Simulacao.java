@@ -42,35 +42,65 @@ public class Simulacao implements Serializable{
         System.out.println("Simulação iniciada...");
         estacao = new EstacaoPadrao("Estação Central");
         
-        
+        // Configuração das zonas (mantida igual)
         zonaNorte.configurarGeracaoLixo(200, 500);
         zonaSul.configurarGeracaoLixo(300, 600);
         zonaLeste.configurarGeracaoLixo(150, 450);
         zonaCentro.configurarGeracaoLixo(250, 550);
         zonaSudeste.configurarGeracaoLixo(180, 400);
         
-        zonaNorte.configurarTempoViagem(10, 15, 5, 8);  // Pico: 10–15 min, Fora pico: 5–8 min
-        zonaSul.configurarTempoViagem(12, 18, 6, 10);
-        zonaLeste.configurarTempoViagem(8, 12, 4, 6);
-        zonaCentro.configurarTempoViagem(15, 20, 7, 12);
-        zonaSudeste.configurarTempoViagem(10, 14, 5, 7);
-
+        // Definir roteiros
+        Zona[] roteiroPadrao = {zonaCentro, zonaNorte, zonaSul, zonaLeste, zonaSudeste};
+        Zona[] roteiroInverso = {zonaSudeste, zonaLeste, zonaSul, zonaNorte, zonaCentro};
         
-        Zona[] roteiro = new Zona[] {zonaCentro, zonaNorte, zonaSul, zonaLeste, zonaSudeste};
-        CaminhaoPequeno.setRoteiro(roteiro);
-       
-        for (CaminhaoPequeno cam : new CaminhaoPequeno[]{
-                new CaminhaoPequenoPadrao(),
-                new CaminhaoPequeno4t(),
-                new CaminhaoPequeno8t(),
-                new CaminhaoPequeno10t()
-        }) {
-            Zona primeiraZona = roteiro[0];
-            int tempo = primeiraZona.calcularTempoViagem(tempoSimulado);
-            cam.iniciarViagemParaZona(primeiraZona, tempo);
-            filaCaminhoesPequenos.enqueue(cam);
+        // Resetar ID para começar em 0001
+        CaminhaoPequeno.resetarContadorId();
+        
+        // ===== CAMINHÕES COM ROTEIRO PADRÃO (IDs 0001-0004) =====
+        CaminhaoPequeno.setRoteiro(roteiroPadrao);
+        
+        // Criar caminhões padrão
+        filaCaminhoesPequenos.enqueue(new CaminhaoPequenoPadrao());   // ID 0001 (2t)
+        filaCaminhoesPequenos.enqueue(new CaminhaoPequeno4t());      // ID 0002 (4t)
+        filaCaminhoesPequenos.enqueue(new CaminhaoPequeno8t());      // ID 0003 (8t)
+        filaCaminhoesPequenos.enqueue(new CaminhaoPequeno10t());     // ID 0004 (10t)
+        
+        // ===== CAMINHÕES COM ROTEIRO INVERSO (IDs 0006-0009) =====
+        // Forçar IDs específicos
+        CaminhaoPequeno.setProximoId(6); // Próximo ID será 0006
+        
+        // Criar caminhões com roteiro inverso
+        CaminhaoPequeno cam6 = new CaminhaoPequenoPadrao();  // ID 0006 (2t)
+        cam6.setRoteiroIndividual(roteiroInverso);
+        filaCaminhoesPequenos.enqueue(cam6);
+        
+        CaminhaoPequeno cam7 = new CaminhaoPequeno4t();      // ID 0007 (4t)
+        cam7.setRoteiroIndividual(roteiroInverso);
+        filaCaminhoesPequenos.enqueue(cam7);
+        
+        CaminhaoPequeno cam8 = new CaminhaoPequeno8t();      // ID 0008 (8t)
+        cam8.setRoteiroIndividual(roteiroInverso);
+        filaCaminhoesPequenos.enqueue(cam8);
+        
+        CaminhaoPequeno cam9 = new CaminhaoPequeno10t();     // ID 0009 (10t)
+        cam9.setRoteiroIndividual(roteiroInverso);
+        filaCaminhoesPequenos.enqueue(cam9);
+        
+        // Iniciar todos os caminhões na primeira zona de seus roteiros
+        Fila.No atual = filaCaminhoesPequenos.getHead();
+        while (atual != null) {
+            CaminhaoPequeno caminhao = atual.getCaminhao();
+            Zona primeiraZona = caminhao.getProximaZona(); // Pega a primeira zona do roteiro apropriado
+            int tempoViagem = primeiraZona.calcularTempoViagem(tempoSimulado);
+            caminhao.iniciarViagemParaZona(primeiraZona, tempoViagem);
+            
+            System.out.println(caminhao + " iniciando na " + primeiraZona.getNome() + 
+                             " (" + (caminhao.getRoteiroIndividual() != null ? "Inverso" : "Padrão") + ")");
+            
+            atual = atual.getProx();
         }
         
+        // Iniciar timer (mantido igual)
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {

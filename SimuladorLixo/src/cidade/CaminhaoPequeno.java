@@ -10,6 +10,7 @@ public abstract class CaminhaoPequeno {
     public int maxViagensPorDia;
     
     protected static Zona[] roteiro;
+    protected Zona[] roteiroIndividual;
     protected int proximaZonaIndex = 0;
     protected Zona zonaAtual;
     protected boolean emViagemParaEstacao = false;
@@ -85,17 +86,20 @@ public abstract class CaminhaoPequeno {
     
     @Override
     public String toString() {
-        return "Caminhão ID " + getId() + " (" + capacidade + "kg, " + 
-                viagensRealizadasHoje + "/" + maxViagensPorDia + " viagens)";
+        String roteiroInfo = (roteiroIndividual != null) ? " (Roteiro Inverso)" : "";
+        return "Caminhão ID " + getId() + roteiroInfo + " (" + capacidade + "kg, " + 
+               viagensRealizadasHoje + "/" + maxViagensPorDia + " viagens)";
     }
     
     public static void setRoteiro(Zona[] zonas) {
-        roteiro = zonas;
+    	roteiro = zonas;
     }
     
     public Zona getProximaZona() {
-        Zona zona = roteiro[proximaZonaIndex];
-        proximaZonaIndex = (proximaZonaIndex + 1) % roteiro.length;
+        // Usa roteiro individual se existir, senão usa o roteiro padrão
+        Zona[] roteiroAtual = (this.roteiroIndividual != null) ? this.roteiroIndividual : CaminhaoPequeno.roteiro;
+        Zona zona = roteiroAtual[proximaZonaIndex];
+        proximaZonaIndex = (proximaZonaIndex + 1) % roteiroAtual.length;
         return zona;
     }
     
@@ -129,6 +133,22 @@ public abstract class CaminhaoPequeno {
 
     public Zona getZonaAtual() {
         return zonaAtual;
+    }
+    
+    public void setRoteiroIndividual(Zona[] zonas) {
+        this.roteiroIndividual = zonas;
+    }
+    
+    public Zona[] getRoteiroIndividual() {
+        return this.roteiroIndividual;
+    }
+    
+    public static void setProximoId(int id) {
+        proximoId = id;
+    }
+    
+    public static void resetarContadorId() {
+        proximoId = 1;
     }
 }
 
